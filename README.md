@@ -12,7 +12,7 @@ This library is used in axy-packages for unit testing at the development stage.
 Uses PHPUnit 10.
 
 * [BaseAxyTestCase](doc/BaseAxyTestCase.md)
-    * assertPartiallySame()
-    * assertItemsPartiallySame()
+    * [assertPartiallySame()](doc/assertPartiallySame.md)
+    * [assertItemsPartiallySame()](doc/assertItemsPartiallySame.md)
 * [TestBootstrap](doc/TestBootstrap.md)
 * [$this->tmpDir()](doc/TestTmpDir.md)

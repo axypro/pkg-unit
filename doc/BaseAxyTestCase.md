@@ -18,5 +18,5 @@ If you override `setUp()` or `tearDown()` we need call parent methods (`parent::
 
 The class adds follow assert-methods:
 
-* [assertPartiallySame](assertPartiallySame.md)
-* [assertItemsPartiallySame](assertItemsPartiallySame.md)
+* [assertPartiallySame()](assertPartiallySame.md)
+* [assertItemsPartiallySame()](assertItemsPartiallySame.md)
