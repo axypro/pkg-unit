@@ -1,0 +1,41 @@
+{
+    "name": "axy/pkg-unit",
+    "type": "library",
+    "description": "Composer package template",
+    "keywords": [],
+    "homepage": "https://github.com/axypro/pkg-unit",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oleg Grigoriev",
+            "email": "go.vasac@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "phpunit/phpunit": "~10.0.15"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "=3.7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "axy\\pkg\\unit\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "axy\\pkg\\unit\\tests\\": "tests"
+        }
+    },
+    "archive": {
+        "exclude": [
+            "/tests/*",
+            "/devops/*",
+            "/doc/*",
+            "/*.sh",
+            "/*.xml.dist",
+            "/CHANGELOG.md"
+        ]
+    }
+}
