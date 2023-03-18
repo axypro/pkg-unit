@@ -8,44 +8,135 @@ use axy\pkg\unit\{
     DirCleaner,
     TestTmpDir,
 };
+use PHPUnit\Framework\ExpectationFailedException;
 
 class TestTmpDirTest extends BaseTestCase
 {
-    public function testTmpDir(): void
+    public function setUp(): void
     {
+        parent::setUp();
         $dir = $this->tmpDir()->dir . '/test';
-        if (file_exists($dir)) {
-            unlink($dir);
-        }
+        $this->tmp = new TestTmpDir($dir);
         DirCleaner::clear($dir, true);
+    }
+
+    public function testRootDir(): void
+    {
+        $this->assertSame($this->tmp->dir, $this->tmpDir()->dir . '/test');
+        $this->assertFileDoesNotExist($this->tmp->dir);
+    }
+
+    public function testMake(): void
+    {
+        $dir = $this->tmp->dir;
         $this->assertFileDoesNotExist($dir);
-        $tmp = new TestTmpDir($dir);
-        $tmp->makeDir('/a/b');
-        $this->assertFileExists("$dir/a/b");
+        $this->tmp->makeDir();
+        $this->assertFileExists($dir);
+        $this->tmp->makeDir();
+        $this->assertFileExists($dir);
+        $this->tmp->makeDir('a/b/c');
+        $this->assertFileExists("$dir/a/b/c");
+    }
 
-        $path = $tmp->getPath('/a/c/f.txt', false);
-        $this->assertSame("$dir/a/c/f.txt", $path);
+    public function testGetPath(): void
+    {
+        $dir = $this->tmp->dir;
         $this->assertFileDoesNotExist("$dir/a/c");
-        $path = $tmp->getPath('/a/c/f.txt', true);
-        $this->assertSame("$dir/a/c/f.txt", $path);
+        $path = $this->tmp->getPath('a/c/file.txt');
+        $this->assertSame("$dir/a/c/file.txt", $path);
+        $this->assertFileDoesNotExist("$dir/a/c");
+        $this->assertSame($path, $this->tmp->getPath('a/c/file.txt', make: true));
         $this->assertFileExists("$dir/a/c");
+    }
 
-        $tmp->assertFileDoesNotExist("$dir/a/d/f.txt");
-        $this->assertFalse($tmp->doesExist("$dir/a/d/f.txt"));
-        $tmp->put("$dir/a/d/f.txt", 'content');
-        $this->assertTrue($tmp->doesExist("$dir/a/d/f.txt"));
-        $tmp->assertFileExists("$dir/a/d/f.txt");
-        $this->assertSame('content', trim($tmp->get("$dir/a/d/f.txt")));
-        $this->assertNull($tmp->get("$dir/a/d/f2.txt"));
+    public function testCheckExists(): void
+    {
+        $dir = $this->tmp->dir;
+        mkdir("$dir/sub", recursive: true);
+        touch("$dir/sub/a.txt");
+        $this->assertTrue($this->tmp->doesExist('sub'));
+        $this->assertTrue($this->tmp->doesExist('/sub/a.txt'));
+        $this->assertFalse($this->tmp->doesExist('sub/sub'));
+        $this->assertFalse($this->tmp->doesExist('sub/b.txt'));
+        $this->tmp->assertFileExists('sub');
+        $this->tmp->assertFileExists('sub/a.txt');
+        $this->tmp->assertFileDoesNotExist('sub/sub');
+        $this->tmp->assertFileDoesNotExist('sub/b.txt');
+        try {
+            $this->tmp->assertFileExists('sub/b.txt');
+            $this->fail('Is not thrown');
+        } catch (ExpectationFailedException) {
+            $this->assertTrue(true, 'Thrown');
+        }
+        try {
+            $this->tmp->assertFileDoesNotExist('sub/a.txt');
+            $this->fail('Is not thrown');
+        } catch (ExpectationFailedException) {
+            $this->assertTrue(true, 'Thrown');
+        }
+    }
 
-        $fp = $tmp->open("$dir/a/d/f.txt", "rt");
-        $this->assertSame('content', trim(fgets($fp)));
+    public function testPut(): void
+    {
+        $dir = $this->tmp->dir;
+        $this->tmp->put('a/b.txt', 'content');
+        $fn = "$dir/a/b.txt";
+        $this->assertFileExists($fn);
+        $this->assertSame('content', trim(file_get_contents($fn)));
+    }
+
+    public function testGet(): void
+    {
+        $dir = $this->tmp->dir;
+        mkdir("$dir/a", recursive: true);
+        $fn = "$dir/a/b.txt";
+        file_put_contents($fn, 'test');
+        $this->assertSame('test', trim($this->tmp->get('a/b.txt')));
+        $this->assertNull($this->tmp->get('a/c.txt'));
+    }
+
+    public function testOpen(): void
+    {
+        $fp = $this->tmp->open('a/b/c.txt', 'wt');
+        $this->assertIsResource($fp);
+        fwrite($fp, 'xxx');
         fclose($fp);
+        $fn = "{$this->tmp->dir}/a/b/c.txt";
+        $this->assertFileExists($fn);
+        $this->assertSame('xxx', trim($this->tmp->get('a/b/c.txt')));
+    }
 
-        $tmp->needCleaning();
+    public function testClear(): void
+    {
+        $dir = $this->tmp->dir;
+        $this->tmp->put('/a/b/c.txt', 'test');
+        $this->tmp->put('/d/e/f.txt', 'test');
+        $this->tmp->put('/g/h/i.txt', 'test');
+        $this->assertFileExists("$dir/a/b/c.txt");
+        $this->tmp->clear('a');
         $this->assertFileExists("$dir/a");
-        $tmp->setUp();
+        $this->assertFileDoesNotExist("$dir/a/b");
+        $this->assertFileExists("$dir/d/e/f.txt");
+        $this->assertFileExists("$dir/g/h/i.txt");
+        $this->tmp->clear();
         $this->assertFileDoesNotExist("$dir/a");
+        $this->assertFileDoesNotExist("$dir/d");
+        $this->assertFileDoesNotExist("$dir/g");
         $this->assertFileExists($dir);
     }
+
+    public function testNeedCleaning(): void
+    {
+        $dir = $this->tmp->dir;
+        $this->tmp->put('/a/b/c.txt', 'test');
+        $this->tmp->put('/d/e/f.txt', 'test');
+        $this->tmp->needCleaning();
+        $this->assertFileExists("$dir/a/b/c.txt");
+        $this->assertFileExists("$dir/d/e/f.txt");
+        $this->tmp->setUp();
+        $this->assertFileDoesNotExist("$dir/a");
+        $this->assertFileDoesNotExist("$dir/d/");
+    }
+
+    private TestTmpDir $tmp;
 }
