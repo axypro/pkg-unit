@@ -1,7 +1,7 @@
 {
     "name": "axy/pkg-unit",
     "type": "library",
-    "description": "Composer package template",
+    "description": "Base classes for axy packages unit testing",
     "keywords": [],
     "homepage": "https://github.com/axypro/pkg-unit",
     "license": "MIT",
