@@ -47,6 +47,19 @@ class TestTmpDirTest extends BaseTestCase
         $this->assertFileDoesNotExist("$dir/a/c");
         $this->assertSame($path, $this->tmp->getPath('a/c/file.txt', make: true));
         $this->assertFileExists("$dir/a/c");
+        file_put_contents($path, 'xxx');
+        $this->assertSame($path, $this->tmp->getPath('a/c/file.txt'));
+        $this->assertFileExists($path);
+        $this->assertSame($path, $this->tmp->getPath('a/c/file.txt', clear: true));
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileExists("$dir/a/c");
+        file_put_contents($path, 'xxx');
+        $this->assertSame("$dir/a", $this->tmp->getPath('a', clear: true));
+        $this->assertFileDoesNotExist("$dir/a");
+        file_put_contents("$dir/a.txt", 'xxx');
+        $this->assertSame($dir, $this->tmp->getPath(clear: true));
+        $this->assertFileExists($dir);
+        $this->assertFileDoesNotExist("$dir/a.txt");
     }
 
     public function testCheckExists(): void

@@ -42,13 +42,20 @@ class TestTmpDir
         }
     }
 
-    public function getPath(?string $path = null, bool $make = false): string
+    public function getPath(?string $path = null, bool $make = false, bool $clear = false): string
     {
         $path = $this->createPath($path);
         if ($make) {
             $dir = dirname($path);
             if (!file_exists($dir)) {
                 mkdir($dir, recursive: true);
+            }
+        }
+        if ($clear && file_exists($path)) {
+            if (is_dir($path)) {
+                DirCleaner::clear($path, rmRoot: ($path !== $this->dir));
+            } else {
+                unlink($path);
             }
         }
         return $path;

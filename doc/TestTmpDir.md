@@ -37,8 +37,9 @@ Leading slashes are ignoring.
 NULL (if is available) correspond to the temp directory root.
 
 * `makeDir([$path])` - makes (recursively) a directory inside the tmp
-* `getPath([$path, bool $make = false]): string` - returns a path inside the tmp
-    * `$make` - if is specified the directory of `$path` will be made
+* `getPath([$path, bool $make = false, bool $clear = false]): string` - returns a path inside the tmp
+    * `$make` - if is specified the parent directory of `$path` will be made
+    * `$clear` - if the target file (or directory) exists it will be deleted
 * `doesExist([$path]): bool` - checks if a path (file or directory) is existing
 * `put(string $path, string $content)` - saves a content to a file
     * if the file directory is not existed it will be made
