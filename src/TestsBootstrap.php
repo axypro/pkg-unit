@@ -43,6 +43,12 @@ class TestsBootstrap
             throw new LogicException('Test bootstrap already initialized');
         }
         self::$instance = new self($dir);
+        set_error_handler(function (int $errno, string $errstr, string $errfile = null, int $errline = 0) {
+            if (!(error_reporting() & $errno)) {
+                return;
+            }
+            throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+        });
     }
 
     public static function getInstance(): self
