@@ -1,3 +1,7 @@
+## Dev
+
+* Up phpunit to 10.5
+
 ## 0.1.2 (14.10.2023)
 
 * Convert warnings etc. into exceptions bypassing phpunit
