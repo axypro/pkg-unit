@@ -64,4 +64,21 @@ abstract class BaseAxyTestCase extends TestCase
     {
         return TestsBootstrap::getInstance()->getTmpDir();
     }
+
+    protected function isInDocker(): bool
+    {
+        if ($this->isItInDocker === null) {
+            $this->isItInDocker = (getenv('AXY_PKG_ENVIRONMENT', true) === 'docker');
+        }
+        return $this->isItInDocker;
+    }
+
+    protected function requiresDocker(?string $message = null): void
+    {
+        if (!$this->isInDocker()) {
+            $this->markTestSkipped($message ?? 'This test must be run in docker');
+        }
+    }
+
+    private ?bool $isItInDocker = null;
 }

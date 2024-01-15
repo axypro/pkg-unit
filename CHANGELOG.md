@@ -1,6 +1,7 @@
 ## Dev
 
 * Up phpunit to 10.5
+* `requiresDocker()` marks a test must be run in the predefined docker environment
 
 ## 0.1.2 (14.10.2023)
 
