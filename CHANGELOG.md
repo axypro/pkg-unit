@@ -1,3 +1,7 @@
+## Dev
+
+* Some dev improvements
+
 ## 0.1.3 (15.01.2024)
 
 * Up phpunit to 10.5
