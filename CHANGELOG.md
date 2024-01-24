@@ -1,4 +1,4 @@
-## Dev
+## 0.1.4 (24.01.2024)
 
 * Some dev improvements
 * `addDownListener()`
