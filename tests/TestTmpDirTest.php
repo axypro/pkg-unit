@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace axy\pkg\unit\tests;
 
+use PHPUnit\Framework\ExpectationFailedException;
 use axy\pkg\unit\{
     DirCleaner,
     TestTmpDir,
 };
-use PHPUnit\Framework\ExpectationFailedException;
 
 class TestTmpDirTest extends BaseTestCase
 {

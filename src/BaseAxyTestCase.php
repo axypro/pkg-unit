@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace axy\pkg\unit;
 
 use PHPUnit\Framework\TestCase;
+use Closure;
 
 abstract class BaseAxyTestCase extends TestCase
 {
@@ -12,12 +13,18 @@ abstract class BaseAxyTestCase extends TestCase
     {
         parent::setUp();
         TestsBootstrap::getInstance()->setUp();
+        $this->downListeners = [];
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
         TestsBootstrap::getInstance()->tearDown();
+        foreach ($this->downListeners as $listener) {
+            if ($listener !== null) {
+                $listener();
+            }
+        }
     }
 
     final public static function assertPartiallySame(
@@ -80,5 +87,24 @@ abstract class BaseAxyTestCase extends TestCase
         }
     }
 
+    protected function addDownListener(Closure $listener): int
+    {
+        $id = count($this->downListeners);
+        $this->downListeners[$id] = $listener;
+        return $id;
+    }
+
+    protected function removeDownListener(int $id): bool
+    {
+        if (!isset($this->downListeners[$id])) {
+            return false;
+        }
+        $this->downListeners[$id] = null;
+        return true;
+    }
+
     private ?bool $isItInDocker = null;
+
+    /** @var Closure[] */
+    private array $downListeners;
 }

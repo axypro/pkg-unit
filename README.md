@@ -16,4 +16,5 @@ Uses PHPUnit 10.
     * [assertItemsPartiallySame()](doc/assertItemsPartiallySame.md)
 * [TestBootstrap](doc/TestBootstrap.md)
 * [tmpDir()](doc/TestTmpDir.md)
+* [addDownListener()](doc/addDownListener.md)
 * [requiresDocker()](doc/requiresDocker.md)
